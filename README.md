@@ -124,6 +124,26 @@ service:
     type: NodePort
 ```
 
+For a publicly reachable node, service exposure and public address advertisement are separate concerns. Enabling `service.p2p` exposes ports, but it does not automatically publish usable external multiaddrs. Configure `config.network.advertise.enabled=true` and set explicit `config.network.advertise.extMultiaddrs` when you want peers to discover the node via your public address.
+
+Example:
+
+```yaml
+service:
+  p2p:
+    enabled: true
+    type: NodePort
+
+config:
+  network:
+    advertise:
+      enabled: true
+      extMultiaddrOnly: true
+      extMultiaddrs:
+        - "/dns4/waku.example.com/tcp/30000/p2p/16Uiu2..."
+        - "/dns4/waku.example.com/tcp/443/wss/p2p/16Uiu2..."
+```
+
 ### Public Websocket Ingress With cert-manager
 
 ```yaml

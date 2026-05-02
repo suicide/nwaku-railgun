@@ -1,0 +1,889 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nameOverride": {
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "type": "string"
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ]
+    },
+    "resources": {
+      "type": "object"
+    },
+    "podAnnotations": {
+      "type": "object"
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean"
+        },
+        "existingSecret": {
+          "type": "string"
+        },
+        "keys": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nodekey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rlnRelayCredPassword": {
+              "type": "string",
+              "minLength": 1
+            },
+            "keystore": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "nodekey",
+            "rlnRelayCredPassword",
+            "keystore"
+          ]
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nodekey": {
+              "type": "string"
+            },
+            "rlnRelayCredPassword": {
+              "type": "string"
+            },
+            "keystore": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "nodekey",
+            "rlnRelayCredPassword",
+            "keystore"
+          ]
+        }
+      },
+      "required": [
+        "create",
+        "existingSecret",
+        "keys",
+        "data"
+      ]
+    },
+    "persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "existingClaim": {
+          "type": "string"
+        },
+        "accessMode": {
+          "type": "string",
+          "enum": [
+            "ReadWriteOnce",
+            "ReadOnlyMany",
+            "ReadWriteMany",
+            "ReadWriteOncePod"
+          ]
+        },
+        "size": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storageClassName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "existingClaim",
+        "accessMode",
+        "size",
+        "storageClassName"
+      ]
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rpc": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "ClusterIP",
+                "LoadBalancer"
+              ]
+            },
+            "port": {
+              "$ref": "#/definitions/port"
+            }
+          },
+          "required": [
+            "enabled",
+            "type",
+            "port"
+          ]
+        },
+        "p2p": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "ClusterIP",
+                "NodePort",
+                "LoadBalancer"
+              ]
+            },
+            "libp2p": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "port": {
+                  "$ref": "#/definitions/port"
+                },
+                "nodePort": {
+                  "$ref": "#/definitions/nodePortOrNull"
+                }
+              },
+              "required": [
+                "port",
+                "nodePort"
+              ]
+            },
+            "discv5": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "port": {
+                  "$ref": "#/definitions/port"
+                },
+                "nodePort": {
+                  "$ref": "#/definitions/nodePortOrNull"
+                }
+              },
+              "required": [
+                "port",
+                "nodePort"
+              ]
+            }
+          },
+          "required": [
+            "enabled",
+            "type",
+            "libp2p",
+            "discv5"
+          ]
+        },
+        "websocket": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "ClusterIP",
+                "NodePort",
+                "LoadBalancer"
+              ]
+            },
+            "port": {
+              "$ref": "#/definitions/port"
+            },
+            "nodePort": {
+              "$ref": "#/definitions/nodePortOrNull"
+            }
+          },
+          "required": [
+            "enabled",
+            "type",
+            "port",
+            "nodePort"
+          ]
+        }
+      },
+      "required": [
+        "rpc",
+        "p2p",
+        "websocket"
+      ]
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "websocket": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "className": {
+              "type": "string"
+            },
+            "annotations": {
+              "type": "object"
+            },
+            "host": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pathType": {
+              "type": "string",
+              "enum": [
+                "Prefix",
+                "Exact",
+                "ImplementationSpecific"
+              ]
+            },
+            "tls": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "secretName": {
+                  "type": "string"
+                },
+                "hosts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "enabled",
+                "secretName",
+                "hosts"
+              ]
+            }
+          },
+          "required": [
+            "enabled",
+            "className",
+            "annotations",
+            "host",
+            "path",
+            "pathType",
+            "tls"
+          ]
+        }
+      },
+      "required": [
+        "websocket"
+      ]
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "relay": {
+          "type": "boolean"
+        },
+        "store": {
+          "type": "boolean"
+        },
+        "storeMessageDbUrl": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filter": {
+          "type": "boolean"
+        },
+        "lightpush": {
+          "type": "boolean"
+        },
+        "relayPeerExchange": {
+          "type": "boolean"
+        },
+        "relayServiceRatio": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rendezvous": {
+          "type": "boolean"
+        },
+        "keepAlive": {
+          "type": "boolean"
+        },
+        "websocketSupport": {
+          "type": "boolean"
+        },
+        "maxMsgSize": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filterSubscriptionTimeout": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "filterMaxPeersToServe": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "peerStoreCapacity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxConnections": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ipColocationLimit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "peerPersistence": {
+          "type": "boolean"
+        },
+        "peerExchange": {
+          "type": "boolean"
+        },
+        "rest": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "address": {
+              "type": "string",
+              "minLength": 1
+            },
+            "admin": {
+              "type": "boolean"
+            },
+            "relayCacheCapacity": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "enabled",
+            "address",
+            "admin",
+            "relayCacheCapacity"
+          ]
+        },
+        "network": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "clusterId": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "numShardsInNetwork": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "shards": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "staticNodes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalStaticNodes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dnsDiscoveryUrl": {
+              "type": "string",
+              "minLength": 1
+            },
+            "discv5Discovery": {
+              "type": "boolean"
+            },
+            "nat": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "extIp": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "enabled",
+                "extIp"
+              ]
+            },
+            "advertise": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "extMultiaddrOnly": {
+                  "type": "boolean"
+                },
+                "extMultiaddrs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "enabled",
+                "extMultiaddrOnly",
+                "extMultiaddrs"
+              ]
+            }
+          },
+          "required": [
+            "clusterId",
+            "numShardsInNetwork",
+            "shards",
+            "staticNodes",
+            "additionalStaticNodes",
+            "dnsDiscoveryUrl",
+            "discv5Discovery",
+            "nat",
+            "advertise"
+          ]
+        },
+        "rlnRelay": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "dynamic": {
+              "type": "boolean"
+            },
+            "ethClientAddress": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "credPath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "userMessageLimit": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "ethContractAddress": {
+              "type": "string",
+              "minLength": 1
+            },
+            "chainId": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "epochSec": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "enabled",
+            "dynamic",
+            "ethClientAddress",
+            "credPath",
+            "userMessageLimit",
+            "ethContractAddress",
+            "chainId",
+            "epochSec"
+          ]
+        }
+      },
+      "required": [
+        "relay",
+        "store",
+        "storeMessageDbUrl",
+        "filter",
+        "lightpush",
+        "relayPeerExchange",
+        "relayServiceRatio",
+        "rendezvous",
+        "keepAlive",
+        "websocketSupport",
+        "maxMsgSize",
+        "filterSubscriptionTimeout",
+        "filterMaxPeersToServe",
+        "peerStoreCapacity",
+        "maxConnections",
+        "ipColocationLimit",
+        "peerPersistence",
+        "peerExchange",
+        "rest",
+        "network",
+        "rlnRelay"
+      ]
+    }
+  },
+  "required": [
+    "replicaCount",
+    "nameOverride",
+    "fullnameOverride",
+    "image",
+    "resources",
+    "podAnnotations",
+    "secrets",
+    "persistence",
+    "service",
+    "ingress",
+    "config"
+  ],
+  "definitions": {
+    "port": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "nodePortOrNull": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 30000,
+      "maximum": 32767
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "rlnRelay": {
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "secrets": {
+            "properties": {
+              "create": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "secrets": {
+            "properties": {
+              "data": {
+                "properties": {
+                  "rlnRelayCredPassword": {
+                    "minLength": 1
+                  },
+                  "keystore": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "secrets": {
+            "properties": {
+              "create": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "secrets": {
+            "properties": {
+              "data": {
+                "properties": {
+                  "nodekey": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "host": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "tls": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "tls": {
+                    "properties": {
+                      "secretName": {
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "network": {
+                "properties": {
+                  "advertise": {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "config": {
+            "properties": {
+              "network": {
+                "properties": {
+                  "advertise": {
+                    "properties": {
+                      "extMultiaddrs": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "service": {
+            "properties": {
+              "p2p": {
+                "properties": {
+                  "type": {
+                    "const": "NodePort"
+                  },
+                  "enabled": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service": {
+            "properties": {
+              "p2p": {
+                "properties": {
+                  "libp2p": {
+                    "properties": {
+                      "nodePort": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "discv5": {
+                    "properties": {
+                      "nodePort": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "service": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "type": {
+                    "const": "NodePort"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "service": {
+            "properties": {
+              "websocket": {
+                "properties": {
+                  "nodePort": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
