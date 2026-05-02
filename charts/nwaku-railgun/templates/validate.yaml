@@ -1,0 +1,1 @@
+{{- include "nwaku-railgun.validate" . -}}

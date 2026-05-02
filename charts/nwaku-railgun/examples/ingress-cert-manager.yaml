@@ -1,0 +1,18 @@
+secrets:
+  existingSecret: nwaku-secrets
+
+service:
+  p2p:
+    enabled: true
+    type: NodePort
+
+ingress:
+  websocket:
+    enabled: true
+    className: nginx
+    host: waku.example.com
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls:
+      enabled: true
+      secretName: waku-websocket-tls

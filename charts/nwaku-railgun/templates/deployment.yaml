@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nwaku-railgun.fullname" . }}
+  labels:
+    {{- include "nwaku-railgun.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "nwaku-railgun.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "nwaku-railgun.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "nwaku-railgun.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --config-file=/app/config.toml
+          ports:
+            - name: libp2p
+              containerPort: {{ .Values.service.p2p.libp2p.port }}
+              protocol: TCP
+            - name: discv5
+              containerPort: {{ .Values.service.p2p.discv5.port }}
+              protocol: UDP
+            - name: websocket
+              containerPort: {{ .Values.service.websocket.port }}
+              protocol: TCP
+            {{- if .Values.config.rest.enabled }}
+            - name: rpc
+              containerPort: {{ .Values.service.rpc.port }}
+              protocol: TCP
+            {{- end }}
+          env:
+            - name: WAKUNODE2_NODEKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nwaku-railgun.secretName" . }}
+                  key: {{ .Values.secrets.keys.nodekey }}
+            {{- if .Values.config.rlnRelay.enabled }}
+            - name: WAKUNODE2_RLN_RELAY_CRED_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nwaku-railgun.secretName" . }}
+                  key: {{ .Values.secrets.keys.rlnRelayCredPassword }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /app/config.toml
+              subPath: config.toml
+              readOnly: true
+            {{- if .Values.config.rlnRelay.enabled }}
+            - name: secrets-vol
+              mountPath: /secrets
+              readOnly: true
+            {{- end }}
+          {{- if .Values.config.rest.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.rpc.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          {{- end }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "nwaku-railgun.pvcName" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "nwaku-railgun.configMapName" . }}
+        {{- if .Values.config.rlnRelay.enabled }}
+        - name: secrets-vol
+          secret:
+            secretName: {{ include "nwaku-railgun.secretName" . }}
+            items:
+              - key: {{ .Values.secrets.keys.keystore }}
+                path: keystore.json
+        {{- end }}

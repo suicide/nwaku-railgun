@@ -1,0 +1,127 @@
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: wakuorg/nwaku
+  tag: v0.38.0
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+podAnnotations: {}
+
+secrets:
+  create: false
+  existingSecret: ""
+  keys:
+    nodekey: NODEKEY
+    rlnRelayCredPassword: RLN_RELAY_CRED_PASSWORD
+    keystore: KEYSTORE
+  data:
+    nodekey: ""
+    rlnRelayCredPassword: ""
+    keystore: ""
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  storageClassName: ""
+
+service:
+  rpc:
+    enabled: true
+    type: ClusterIP
+    port: 8546
+  p2p:
+    enabled: false
+    type: NodePort
+    libp2p:
+      port: 30000
+      nodePort: 30000
+    discv5:
+      port: 30001
+      nodePort: 30001
+  websocket:
+    enabled: false
+    type: ClusterIP
+    port: 30002
+    nodePort: null
+
+ingress:
+  websocket:
+    enabled: false
+    className: ""
+    annotations: {}
+    host: ""
+    path: /
+    pathType: Prefix
+    tls:
+      enabled: false
+      secretName: ""
+      hosts: []
+
+config:
+  relay: true
+  store: true
+  storeMessageDbUrl: sqlite:///data/store.sqlite3
+  filter: true
+  lightpush: true
+  relayPeerExchange: false
+  relayServiceRatio: "80:20"
+  rendezvous: true
+  keepAlive: false
+  websocketSupport: true
+  maxMsgSize: 512KiB
+  filterSubscriptionTimeout: 900
+  filterMaxPeersToServe: 2000
+  peerStoreCapacity: 2000
+  maxConnections: 500
+  ipColocationLimit: 20
+  peerPersistence: false
+  peerExchange: true
+  rest:
+    enabled: true
+    address: 0.0.0.0
+    admin: true
+    relayCacheCapacity: 3000
+  network:
+    clusterId: 5
+    numShardsInNetwork: 6
+    shards:
+      - 1
+    staticNodes:
+      - /dns4/prod.rootedinprivacy.com/tcp/30304/p2p/16Uiu2HAkwNeQVY32bUrL1eM68ryMa48PXY5Bhfxfg9e2byYcc46m
+      - /dns4/prod.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAkwNeQVY32bUrL1eM68ryMa48PXY5Bhfxfg9e2byYcc46m
+      - /dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAmFbD2ZvAFi2j9jjDo6g4HFbQAhfjDfnTTrbyRGQRmtG7x
+      - /dns4/relay-b.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAmPtEAoPPok7VLrpNNC6t92ZQFqLndHvkdx6Fk3CxA4MaG
+      - /dns4/client-edge.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAmQdCGG5qREQCq96kucmpUVupmvLwrTRjMazPAaMTNP97A
+    additionalStaticNodes: []
+    dnsDiscoveryUrl: enrtree://APMYHUVNQWHJNPI5L2KQ765EMCKUAMRWPUH3U2QIKPK6XEV3OW442@discovery.rootedinprivacy.com
+    discv5Discovery: true
+    nat:
+      enabled: false
+      extIp: 127.0.0.1
+    advertise:
+      enabled: false
+      extMultiaddrOnly: true
+      extMultiaddrs: []
+  rlnRelay:
+    enabled: false
+    dynamic: false
+    ethClientAddress:
+      - https://linea-sepolia.drpc.org
+    credPath: /secrets/keystore.json
+    userMessageLimit: 100
+    ethContractAddress: 0xB9cd878C90E49F797B4431fBF4fb333108CB90e6
+    chainId: 59141
+    epochSec: 600

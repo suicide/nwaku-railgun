@@ -1,0 +1,10 @@
+secrets:
+  existingSecret: nwaku-secrets
+
+service:
+  p2p:
+    enabled: false
+
+ingress:
+  websocket:
+    enabled: false

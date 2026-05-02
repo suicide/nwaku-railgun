@@ -1,0 +1,27 @@
+{{- if .Values.service.p2p.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nwaku-railgun.p2pServiceName" . }}
+  labels:
+    {{- include "nwaku-railgun.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.p2p.type }}
+  selector:
+    {{- include "nwaku-railgun.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: libp2p
+      port: {{ .Values.service.p2p.libp2p.port }}
+      targetPort: libp2p
+      protocol: TCP
+      {{- if eq .Values.service.p2p.type "NodePort" }}
+      nodePort: {{ .Values.service.p2p.libp2p.nodePort }}
+      {{- end }}
+    - name: discv5
+      port: {{ .Values.service.p2p.discv5.port }}
+      targetPort: discv5
+      protocol: UDP
+      {{- if eq .Values.service.p2p.type "NodePort" }}
+      nodePort: {{ .Values.service.p2p.discv5.nodePort }}
+      {{- end }}
+{{- end }}

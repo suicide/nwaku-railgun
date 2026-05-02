@@ -1,0 +1,20 @@
+{{- if include "nwaku-railgun.websocketServiceNeeded" . }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nwaku-railgun.websocketServiceName" . }}
+  labels:
+    {{- include "nwaku-railgun.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.websocket.type }}
+  selector:
+    {{- include "nwaku-railgun.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: websocket
+      port: {{ .Values.service.websocket.port }}
+      targetPort: websocket
+      protocol: TCP
+      {{- if eq .Values.service.websocket.type "NodePort" }}
+      nodePort: {{ .Values.service.websocket.nodePort }}
+      {{- end }}
+{{- end }}
