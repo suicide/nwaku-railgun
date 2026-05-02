@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint chart
+        run: helm lint ./charts/nwaku-railgun
+
+      - name: Render private example
+        run: helm template nwaku ./charts/nwaku-railgun -f ./charts/nwaku-railgun/examples/private.yaml
+
+      - name: Render cert-manager ingress example
+        run: helm template nwaku ./charts/nwaku-railgun -f ./charts/nwaku-railgun/examples/ingress-cert-manager.yaml
+
+      - name: Render Traefik ingress example
+        run: helm template nwaku ./charts/nwaku-railgun -f ./charts/nwaku-railgun/examples/ingress-traefik.yaml
+
+      - name: Render RLN created secret example
+        run: helm template nwaku ./charts/nwaku-railgun -f ./charts/nwaku-railgun/examples/rln-created-secret.yaml

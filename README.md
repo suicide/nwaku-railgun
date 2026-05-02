@@ -25,6 +25,16 @@ helm upgrade --install nwaku ./charts/nwaku-railgun \
   -f values.yaml
 ```
 
+Published chart installs use GHCR OCI:
+
+```bash
+helm install nwaku oci://ghcr.io/suicide/charts/nwaku-railgun \
+  --version 0.1.0 \
+  --namespace waku \
+  --create-namespace \
+  -f values.yaml
+```
+
 The chart fails fast unless you configure one secret strategy:
 
 - `secrets.existingSecret=<name>`
@@ -258,6 +268,51 @@ Render the chart:
 ```bash
 helm template nwaku ./charts/nwaku-railgun
 ```
+
+Render the chart with a valid example file:
+
+```bash
+helm template nwaku ./charts/nwaku-railgun \
+  -f ./charts/nwaku-railgun/examples/private.yaml
+```
+
+The chart fails fast unless you set one secret strategy, so plain `helm template` requires either an example file or an override such as `--set secrets.existingSecret=nwaku-secrets`.
+
+## CI
+
+GitHub Actions validates the chart on every pull request and on pushes to `master` by running:
+
+- `helm lint ./charts/nwaku-railgun`
+- `helm template` with each example values file under `charts/nwaku-railgun/examples`
+
+## Publishing
+
+Chart releases are published to `oci://ghcr.io/suicide/charts/nwaku-railgun`.
+
+Pull a published chart:
+
+```bash
+helm pull oci://ghcr.io/suicide/charts/nwaku-railgun --version 0.1.0
+```
+
+Install a published chart:
+
+```bash
+helm install nwaku oci://ghcr.io/suicide/charts/nwaku-railgun \
+  --version 0.1.0 \
+  --namespace waku \
+  --create-namespace \
+  -f values.yaml
+```
+
+Release flow:
+
+1. Bump `version` in `charts/nwaku-railgun/Chart.yaml`.
+2. Merge the version change to `master`.
+3. Create and push a matching tag such as `v0.1.1`.
+4. GitHub Actions packages the chart and pushes it to GHCR.
+
+The release workflow rejects tags that do not match the chart version.
 
 ## License
 

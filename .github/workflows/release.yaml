@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Verify tag matches chart version
+        run: |
+          chart_version=$(grep '^version:' ./charts/nwaku-railgun/Chart.yaml | cut -d' ' -f2)
+          tag_version="${GITHUB_REF_NAME#v}"
+
+          if [ "$chart_version" != "$tag_version" ]; then
+            printf 'Tag version %s does not match chart version %s\n' "$tag_version" "$chart_version"
+            exit 1
+          fi
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Package chart
+        run: helm package ./charts/nwaku-railgun --destination ./dist
+
+      - name: Push chart to GHCR
+        run: helm push ./dist/nwaku-railgun-${GITHUB_REF_NAME#v}.tgz oci://ghcr.io/suicide/charts
