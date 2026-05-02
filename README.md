@@ -258,3 +258,7 @@ Render the chart:
 ```bash
 helm template nwaku ./charts/nwaku-railgun
 ```
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE`.
