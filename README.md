@@ -120,6 +120,50 @@ secrets:
   existingSecret: nwaku-secrets
 ```
 
+### Internal Peer Node
+
+Use this mode when the node should only be reachable inside the cluster, but still expose p2p, websocket, and REST to in-cluster consumers. This is suitable for additional nodes that connect through your front-facing fleet without using public `NodePort` or ingress exposure.
+
+```yaml
+secrets:
+  existingSecret: nwaku-secrets
+
+service:
+  rpc:
+    enabled: true
+    type: ClusterIP
+  p2p:
+    enabled: true
+    type: ClusterIP
+  websocket:
+    enabled: true
+    type: ClusterIP
+
+ingress:
+  websocket:
+    enabled: false
+
+config:
+  relay: true
+  store: false
+  filter: false
+  lightpush: false
+  relayPeerExchange: false
+  relayServiceRatio: "100:0"
+  rendezvous: false
+  websocketSupport: true
+  rest:
+    enabled: true
+    address: 0.0.0.0
+    admin: false
+  network:
+    staticNodes:
+      - "/dns4/waku2.privatepaymaster.com/tcp/30000/p2p/16Uiu2HA..."
+      - "/dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HA..."
+    dnsDiscoveryUrl: ""
+    discv5Discovery: false
+```
+
 ### Public Node
 
 Public p2p exposure is opt-in. Enable the p2p service and, if needed, websocket ingress separately.
@@ -236,6 +280,13 @@ Default private exposure uses:
 
 - `service.p2p.enabled=false`
 - `service.websocket.enabled=false`
+- `ingress.websocket.enabled=false`
+
+Internal-only service exposure uses:
+
+- `service.rpc.type=ClusterIP`
+- `service.p2p.type=ClusterIP`
+- `service.websocket.type=ClusterIP`
 - `ingress.websocket.enabled=false`
 
 Public exposure uses:

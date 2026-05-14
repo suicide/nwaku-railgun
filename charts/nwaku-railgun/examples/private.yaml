@@ -2,9 +2,36 @@ secrets:
   existingSecret: nwaku-secrets
 
 service:
+  rpc:
+    enabled: true
+    type: ClusterIP
   p2p:
-    enabled: false
+    enabled: true
+    type: ClusterIP
+  websocket:
+    enabled: true
+    type: ClusterIP
 
 ingress:
   websocket:
     enabled: false
+
+config:
+  relay: true
+  store: false
+  filter: false
+  lightpush: false
+  relayPeerExchange: false
+  relayServiceRatio: "100:0"
+  rendezvous: false
+  websocketSupport: true
+  rest:
+    enabled: true
+    address: 0.0.0.0
+    admin: false
+  network:
+    staticNodes:
+      - "/dns4/waku2.privatepaymaster.com/tcp/30000/p2p/16Uiu2HA..."
+      - "/dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HA..."
+    dnsDiscoveryUrl: ""
+    discv5Discovery: false

@@ -463,8 +463,7 @@
               }
             },
             "dnsDiscoveryUrl": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "discv5Discovery": {
               "type": "boolean"
