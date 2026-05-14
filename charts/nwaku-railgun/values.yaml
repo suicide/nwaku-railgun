@@ -99,6 +99,7 @@ config:
     numShardsInNetwork: 6
     shards:
       - 1
+    dnsAddrsNameServers: []
     staticNodes:
       - /dns4/prod.rootedinprivacy.com/tcp/30304/p2p/16Uiu2HAkwNeQVY32bUrL1eM68ryMa48PXY5Bhfxfg9e2byYcc46m
       - /dns4/prod.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAkwNeQVY32bUrL1eM68ryMa48PXY5Bhfxfg9e2byYcc46m

@@ -157,6 +157,8 @@ config:
     address: 0.0.0.0
     admin: false
   network:
+    dnsAddrsNameServers:
+      - 10.96.0.10
     staticNodes:
       - "/dns4/waku2.privatepaymaster.com/tcp/30000/p2p/16Uiu2HA..."
       - "/dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HA..."
@@ -304,6 +306,26 @@ config:
     additionalStaticNodes:
       - "/dns4/waku1.privatepaymaster.com/tcp/30000/p2p/16Uiu2HAkypTi3rsec2pkht6vUGTQHr2fkMjsACwM5hpEqEnrcyvE"
       - "/dns4/waku2.privatepaymaster.com/tcp/30000/p2p/16Uiu2HAmSbCr93dtYB3hAckmXKd3B5Qo7S9YoSri3exjLhGYBWfd"
+```
+
+## DNS-Based Multiaddrs
+
+`nwaku` resolves `/dns4`, `/dns6`, and `/dnsaddr` peers using its own resolver settings. If `config.network.dnsAddrsNameServers` is unset, `nwaku` defaults to Cloudflare resolvers `1.1.1.1` and `1.0.0.1`. In Kubernetes, set `config.network.dnsAddrsNameServers` to your cluster DNS service IP when those peers should resolve against cluster-local names such as `*.svc.cluster.local`.
+
+Example:
+
+```yaml
+config:
+  network:
+    dnsAddrsNameServers:
+      - 10.96.0.10
+      - 1.1.1.1
+```
+
+This renders to:
+
+```toml
+dns-addrs-name-server=["10.96.0.10", "1.1.1.1"]
 ```
 
 ## Development

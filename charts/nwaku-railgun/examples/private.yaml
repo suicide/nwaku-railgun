@@ -30,6 +30,8 @@ config:
     address: 0.0.0.0
     admin: false
   network:
+    dnsAddrsNameServers:
+      - 10.96.0.10
     staticNodes:
       - "/dns4/waku2.privatepaymaster.com/tcp/30000/p2p/16Uiu2HA..."
       - "/dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HA..."

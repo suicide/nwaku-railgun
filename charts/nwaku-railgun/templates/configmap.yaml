@@ -36,6 +36,9 @@ data:
     cluster-id={{ .Values.config.network.clusterId }}
     num-shards-in-network={{ .Values.config.network.numShardsInNetwork }}
     shard={{ .Values.config.network.shards | toJson }}
+    {{- if gt (len .Values.config.network.dnsAddrsNameServers) 0 }}
+    dns-addrs-name-server={{ .Values.config.network.dnsAddrsNameServers | toJson }}
+    {{- end }}
 
     staticnode={{ $staticNodes | toJson }}
 

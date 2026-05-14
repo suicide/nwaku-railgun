@@ -448,6 +448,13 @@
                 "minimum": 0
               }
             },
+            "dnsAddrsNameServers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
             "staticNodes": {
               "type": "array",
               "items": {
@@ -514,6 +521,7 @@
             "clusterId",
             "numShardsInNetwork",
             "shards",
+            "dnsAddrsNameServers",
             "staticNodes",
             "additionalStaticNodes",
             "dnsDiscoveryUrl",
